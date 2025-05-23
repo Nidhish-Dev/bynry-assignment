@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import { db } from "../services/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import MapViewer from "../components/MapViewer";
+import ParticleEffect from "../components/ParticleEffect.jsx";
 
 const ProfileDetail = () => {
   const { id } = useParams();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [clickTrigger, setClickTrigger] = useState(0);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -31,58 +34,74 @@ const ProfileDetail = () => {
   }, [id]);
 
   if (loading) return (
-    <div className="text-center mt-8 text-[#86868B]">
-      <div className="spinner border-4 border-[#3A3A3C] border-t-[#007AFF] rounded-full w-8 h-8 animate-spin mx-auto"></div>
-      <p className="mt-4 text-sm">Loading profile...</p>
+    <div className="text-center mt-16 text-cyan-400 font-orbitron">
+      <div className="animate-pulse rounded-full h-16 w-16 border-4 border-cyan-400/50 border-t-cyan-400 mx-auto"></div>
+      <p className="mt-6 text-sm">Loading profile...</p>
     </div>
   );
 
   if (!profile) return (
-    <div className="text-center mt-8 text-[#FF3B30]">
-      Profile not found. <Link to="/" className="text-[#007AFF] hover:underline text-sm">Go back</Link>
+    <div className="text-center mt-16 text-gray-300 font-orbitron">
+      Profile not found.{" "}
+      <Link to="/" className="text-cyan-300 hover:text-cyan-200 text-sm transition-colors duration-300">
+        Go back
+      </Link>
     </div>
   );
 
   return (
-    <div className="max-w-6xl mx-auto p-6 backdrop-blur-md bg-[#2C2C2E]/80 rounded-xl shadow-sm border border-[#3A3A3C]/50 mt-8">
-      <div className="flex flex-col lg:flex-row lg:space-x-6">
-        {/* Profile Info (Left on Desktop, Top on Mobile) */}
-        <div className="lg:w-1/2 flex flex-col items-center lg:items-start">
-          <h1 className="text-2xl font-semibold mb-4 text-[#F5F5F7] tracking-tight">{profile.name}</h1>
+    <div className="max-w-7xl mx-auto p-10 bg-gradient-to-br from-gray-950 to-gray-900 rounded-3xl shadow-2xl border border-cyan-500/30 mt-10">
+      <div className="flex flex-col lg:flex-row lg:space-x-10">
+        <motion.div
+          className="lg:w-1/2 flex flex-col items-center lg:items-start"
+          initial={{ opacity: 0, x: -100 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+        >
+          <h1 className="text-4xl font-bold mb-8 text-cyan-200 font-orbitron tracking-wide glow-cyan">{profile.name}</h1>
           {profile.photo && (
-            <img
+            <motion.img
               src={profile.photo}
               alt={profile.name}
-              className="w-40 h-40 object-cover rounded-md mb-6 border-2 border-[#007AFF]"
+              className="w-64 h-64 object-cover rounded-xl mb-8 border-4 border-cyan-400/50 glow-cyan"
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
             />
           )}
           <div className="w-full text-center lg:text-left">
-            <p className="mb-3 text-[#86868B] text-sm">{profile.description}</p>
-            <p className="mb-3 text-[#86868B] text-sm">
+            <p className="mb-6 text-gray-300 text-sm font-inter">{profile.description}</p>
+            <p className="mb-6 text-gray-300 text-sm font-inter">
               <strong>City:</strong> {profile.city}
             </p>
-            <p className="mb-3 text-[#86868B] text-sm">
+            <p className="mb-6 text-gray-300 text-sm font-inter">
               <strong>Contact:</strong> {profile.contact || "N/A"}
             </p>
-            <p className="mb-4 text-[#86868B] text-sm">
+            <p className="mb-6 text-gray-300 text-sm font-inter">
               <strong>Interests:</strong> {profile.interests || "N/A"}
             </p>
           </div>
-        </div>
-
-        {/* Map (Right on Desktop, Bottom on Mobile) */}
-        <div className="lg:w-1/2 mt-6 lg:mt-0">
-          <h2 className="text-lg font-medium mb-4 text-[#F5F5F7] tracking-tight text-center lg:text-left">Location Map</h2>
+        </motion.div>
+        <motion.div
+          className="lg:w-1/2 mt-10 lg:mt-0"
+          initial={{ opacity: 0, x: 100 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+        >
+          <h2 className="text-2xl font-bold mb-8 text-cyan-200 font-orbitron tracking-wide glow-cyan text-center lg:text-left">
+            Location Map
+          </h2>
           <MapViewer city={profile.city} />
-        </div>
+        </motion.div>
       </div>
-
-      <div className="mt-6 text-center">
+      <div className="mt-10 text-center">
         <Link
           to="/"
-          className="inline-block bg-[#007AFF] text-[#F5F5F7] px-5 py-2 rounded-md hover:bg-[#005BB5] transition-all duration-300 text-sm font-medium tracking-wide"
+          className="relative inline-block bg-gray-800 text-cyan-300 px-8 py-4 rounded-lg font-medium font-orbitron tracking-wide hover:bg-gray-700 transition-colors duration-300"
+          onClick={() => setClickTrigger((prev) => prev + 1)}
         >
-          Back to List
+          <span className="relative z-10">Back to List</span>
+          <ParticleEffect trigger={clickTrigger} />
         </Link>
       </div>
     </div>

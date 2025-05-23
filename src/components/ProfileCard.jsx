@@ -1,31 +1,66 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import ParticleEffect from "./ParticleEffect.jsx";
 
-const ProfileCard = ({ profile }) => {
+const ProfileCard = ({ profile, onSummary }) => {
+  const [clickTrigger, setClickTrigger] = useState(0);
+
+  const handleClick = () => {
+    setClickTrigger((prev) => prev + 1);
+    if (onSummary) onSummary(profile);
+  };
+
   return (
     <motion.div
-      whileHover={{ y: -3, boxShadow: "0 6px 12px rgba(0, 0, 0, 0.2)" }}
-      className="backdrop-blur-md bg-[#2C2C2E]/80 p-6 rounded-xl shadow-sm border border-[#3A3A3C]/50 flex flex-col items-center transition-all duration-300"
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
+      className="relative backdrop-blur-xl bg-gray-950/90 p-8 rounded-3xl shadow-2xl border border-cyan-500/30 flex flex-col items-center cursor-pointer hover:border-cyan-400/50 transition-colors duration-300"
+      onClick={handleClick}
     >
       {profile.photo ? (
-        <img
+        <motion.img
           src={profile.photo}
           alt={profile.name}
-          className="w-20 h-20 rounded-full object-cover mb-4 border-2 border-[#007AFF]"
+          className="w-28 h-28 rounded-full object-cover mb-6 border-4 border-cyan-400/50 glow-cyan"
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
         />
       ) : (
-        <div className="w-20 h-20 rounded-full bg-[#3A3A3C]/50 flex items-center justify-center mb-4 text-[#86868B] text-lg">
+        <motion.div
+          className="w-28 h-28 rounded-full bg-gray-900/50 flex items-center justify-center mb-6 text-cyan-400 text-xl font-orbitron"
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+        >
           N/A
-        </div>
+        </motion.div>
       )}
-      <h3 className="text-lg font-medium text-[#F5F5F7] tracking-tight">{profile.name}</h3>
-      <p className="text-sm text-[#86868B]">{profile.city}</p>
+      <motion.h3
+        className="text-2xl font-bold text-cyan-200 font-orbitron tracking-wide"
+        initial={{ x: -100, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        transition={{ duration: 0.5, delay: 0.4 }}
+      >
+        {profile.name}
+      </motion.h3>
+      <motion.p
+        className="text-sm text-gray-300 font-inter"
+        initial={{ x: 100, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        transition={{ duration: 0.5, delay: 0.6 }}
+      >
+        {profile.city}
+      </motion.p>
       <Link
         to={`/profile/${profile.id}`}
-        className="mt-4 inline-block bg-[#007AFF] text-[#F5F5F7] px-4 py-2 rounded-md hover:bg-[#005BB5] transition-all duration-300 text-sm font-medium tracking-wide"
+        className="relative mt-6 inline-block bg-gray-800 text-cyan-300 px-6 py-3 rounded-lg font-medium font-inter tracking-wide hover:bg-gray-700 transition-colors duration-300"
+        onClick={() => setClickTrigger((prev) => prev + 1)}
       >
-        View Profile
+        <span className="relative z-10">View Profile</span>
+        <ParticleEffect trigger={clickTrigger} />
       </Link>
     </motion.div>
   );
